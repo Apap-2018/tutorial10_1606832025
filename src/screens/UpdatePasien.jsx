@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loading } from '../components/Loading';
 import { FormUpdatePasien } from '../containers/FormUpdatePasien';
-import { Appointment } from '../utils/Appointment';
+import { Appointment} from '../utils/Appointment.js';
 
 export class UpdatePasien extends React.Component {
 	/** 
@@ -18,18 +18,16 @@ export class UpdatePasien extends React.Component {
 		this.handleFormSubmit = this.handleFormSubmit.bind(this)
 		
 		Appointment.getDetailPasien(this.props.match.params.id).then(response => {
-		 	if (response.status === 200) {
-		 	this.setState({
-		 		loading: false,
-		 		pasien: response.result
-		 	})
-		 	}else{
-		 		alert('Data tidak ditemukan')
-		 		this.props.history.push('/all-pasien')
-		 	}
-		 	
-		 	
-		 })
+			if (response.status === 200){
+				this.setState({
+					loading: false,
+					pasien: response.result
+				})
+			} else {
+				alert('Data tidak ditemukan')
+				this.props.history.push('/all-pasien')
+			}
+		})
 	}
 
 	handleFormSubmit(e) {
@@ -46,34 +44,35 @@ export class UpdatePasien extends React.Component {
 		 const dataJson = {}
 
 		 data.forEach((val, key) => {
-		 	if (val !== ""){
+		 	if (val !== "") {
 		 		let name = key.split('.');
-			 	if (name.length > 1){
-			 		let last = name.pop()
-			 		name.reduce((prev, next) => {
-			 			return prev[next] = prev[next] || {};
-			 		}, dataJson)[last] = val
-			 	}else{
-			 		dataJson[key] = val
-
-			 	}
+		 		if (name.length > 1){
+		 			let last = name.pop()
+		 			name.reduce((prev, next) => {
+		 				return prev[next] = prev[next] || {};
+		 			}, dataJson)[last] = val
+		 		} else {
+		 			dataJson[key] = val
+		 		}
 		 	}
 		 })
 
 		 Appointment.updateStatusPasien(dataJson).then(response => {
-			if ( response.status === 200){
-			 	this.setState({
-			 		loading: false,
-			 		pasien: response.result
-			 	})
-			 	alert(`Sukses update pasien ${this.state.pasien.nama}`)
-		 } else{
+		 console.log(response.status)
+		 	if (response.status === 200) {
+		 		this.setState({
+		 			loading: false,
+		 			pasien: response.result
+		 		})
+		 		alert(`Sukses update pasien ${this.state.pasien.nama}`)
+		 	} else {
 		 		this.setState({
 		 			loading: false
 		 		})
-		 		alert(`Gagal update pasien ${this.state.pasien.nama}`)
-		 }
-		})
+		 		alert(`Gagal update pasien ${this.state.pasien.name}`)
+		 	}
+		 })
+
 	}
 
 	render() {
@@ -82,6 +81,7 @@ export class UpdatePasien extends React.Component {
 				<Loading msg="Fetching Data..." />
 			)
 		} else {
+		console.log(this.state.pasien)
 			return (
 				<FormUpdatePasien pasien={this.state.pasien} onSubmit={this.handleFormSubmit} />
 			)
